@@ -13,10 +13,10 @@
 var notifiyPercents = [20, 50, 100];
 var notifiyColors = ['#ff8888', '#ffff88', '#ffffff']
 
-function waitForElement(selector, interval) {
+function waitForElement(selectFunction, interval) {
     return new Promise((resolve) => {
         const intervalId = setInterval(() => {
-            const element = document.querySelector(selector);
+            const element = selectFunction();
             if (element) {
                 clearInterval(intervalId);
                 resolve(element);
@@ -56,25 +56,30 @@ function initializePopup() {
 }
 
 function displayPopup(limits) {
-    var containerElement = document.getElementById('APILimitNotifier-container');
-    containerElement.innerHTML = '<div id="APILimitNotifier-container"></div>';
-    var displayNum = 3;
-    for (let index = 0; index < Math.min(displayNum, limits.length); index++) {
-        var [urlName, limitRemaining, limitReset, limitLimit, limitRemainingPercent] = limits[index];
-        var notificationElement = document.createElement('div');
-        for (var j = 0; j < notifiyPercents.length; j++) {
-            if (limitRemainingPercent <= notifiyPercents[j]) {
-                notificationElement.style.backgroundColor = notifiyColors[j];
-                break;
+    waitForElement(() => document.getElementById('APILimitNotifier-container'), 500)
+        .then((containerElement) => {
+            containerElement.innerHTML = '<div id="APILimitNotifier-container"></div>';
+            var displayNum = 3;
+            for (let index = 0; index < Math.min(displayNum, limits.length); index++) {
+                var [urlName, limitRemaining, limitReset, limitLimit, limitRemainingPercent] = limits[index];
+                var notificationElement = document.createElement('div');
+                for (var j = 0; j < notifiyPercents.length; j++) {
+                    if (limitRemainingPercent <= notifiyPercents[j]) {
+                        notificationElement.style.backgroundColor = notifiyColors[j];
+                        break;
+                    }
+                }
+                var timeUntileRest = limitReset - Math.floor(Date.now() / 1000);
+                notificationElement.classList.add('APILimitNotifier-notification');
+                notificationElement.innerHTML = `<ul><li>${urlName}</li><li>Remaining: ${limitRemainingPercent}%</li><li>Rest: ${Math.floor(timeUntileRest / 6) / 10} min</li></ul>`
+                if (containerElement !== null) {
+                    containerElement.appendChild(notificationElement);
+                }
             }
-        }
-        var timeUntileRest = limitReset - Math.floor(Date.now() / 1000);
-        notificationElement.classList.add('APILimitNotifier-notification');
-        notificationElement.innerHTML = `<ul><li>${urlName}</li><li>Remaining: ${limitRemainingPercent}%</li><li>Rest: ${Math.floor(timeUntileRest / 6) / 10} min</li></ul>`
-        if (containerElement !== null) {
-            containerElement.appendChild(notificationElement);
-        }
-    }
+        })
+        .catch((error) => {
+            console.log('要素が見つかりませんでした:', error);
+        });
 }
 
 function storeLimit(urlName, limitRemaining, limitReset, limitLimit) {
@@ -84,7 +89,7 @@ function storeLimit(urlName, limitRemaining, limitReset, limitLimit) {
 }
 
 function displayLimitRemainingPercent(limitRemainingPercent) {
-    waitForElement('#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1awozwy.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a', 500)
+    waitForElement(() => document.querySelector('#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1awozwy.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a'), 500)
         .then((twitterBirdIcon) => {
             var color = '#88ff88';//green
             if (limitRemainingPercent <= 20)
@@ -92,7 +97,7 @@ function displayLimitRemainingPercent(limitRemainingPercent) {
             twitterBirdIcon.style.background = `linear-gradient(white ${100 - limitRemainingPercent}%, ${color} ${100 - limitRemainingPercent}%)`;
         })
         .catch((error) => {
-            console.log("要素が見つかりませんでした:", error);
+            console.log('要素が見つかりませんでした:', error);
         });
 }
 
@@ -118,9 +123,10 @@ function updateDisplay() {
 }
 
 function addToggleFunction() {
-    waitForElement('#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1awozwy.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a', 500)
+    waitForElement(() => document.querySelector('#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1awozwy.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a'), 500)
         .then((twitterBirdIcon) => {
             var containerElement = document.getElementById('APILimitNotifier-container');
+            console.log("hello");
             twitterBirdIcon.addEventListener('click', function(event) {
                 event.preventDefault(); // デフォルトのクリック動作をキャンセルする
             });
@@ -134,9 +140,8 @@ function addToggleFunction() {
             };
         })
         .catch((error) => {
-            console.log("要素が見つかりませんでした:", error);
+            console.log('要素が見つかりませんでした:', error);
         });
-    // var twitterBirdIcon = document.querySelector('#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1awozwy.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a');
 }
 
 (function(open) {
@@ -155,9 +160,7 @@ function addToggleFunction() {
     };
 })(XMLHttpRequest.prototype.open);
 
-
-window.addEventListener("load", function() {
+window.addEventListener('load', function() {
     initializePopup();
     addToggleFunction();
-})
-
+});
