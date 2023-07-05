@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         APILimitMonitor
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.3
 // @description  Monitor twitter api limit
 // @author       https://twitter.com/kumakumaaaaa__
 // @match        https://twitter.com/*
@@ -37,6 +37,7 @@ function initializePopup() {
         top: 70px;
         left: 10px;
         z-index: 1000;
+        display: none;
     }
     .APILimitNotifier-notification {
         position: sticky;
