@@ -126,9 +126,8 @@ function addToggleFunction() {
     waitForElement(() => document.querySelector('#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1awozwy.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a'), 500)
         .then((twitterBirdIcon) => {
             var containerElement = document.getElementById('APILimitNotifier-container');
-            console.log("hello");
             twitterBirdIcon.addEventListener('click', function(event) {
-                event.preventDefault(); // デフォルトのクリック動作をキャンセルする
+                event.preventDefault();
             });
             twitterBirdIcon.onclick = function () {
                 if (containerElement.style.display === 'none') {
@@ -162,5 +161,8 @@ function addToggleFunction() {
 
 window.addEventListener('load', function() {
     initializePopup();
-    addToggleFunction();
+    setTimeout(function() {
+        addToggleFunction();
+    }, 3000);
+    updateDisplay();
 });
