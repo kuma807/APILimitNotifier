@@ -12,6 +12,7 @@
 
 var notifiyPercents = [20, 50, 100];
 var notifiyColors = ['#ff8888', '#ffff88', '#ffffff']
+var twitterBirdIconPaths = ['#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1habvwh.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a', '#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1awozwy.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a']
 
 function waitForElement(selectFunction, interval) {
     return new Promise((resolve) => {
@@ -89,16 +90,18 @@ function storeLimit(urlName, limitRemaining, limitReset, limitLimit) {
 }
 
 function displayLimitRemainingPercent(limitRemainingPercent) {
-    waitForElement(() => document.querySelector('#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1awozwy.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a'), 500)
-        .then((twitterBirdIcon) => {
-            var color = '#88ff88';//green
-            if (limitRemainingPercent <= 20)
-                color = '#ff8888';//red
-            twitterBirdIcon.style.background = `linear-gradient(white ${100 - limitRemainingPercent}%, ${color} ${100 - limitRemainingPercent}%)`;
-        })
-        .catch((error) => {
-            console.log('要素が見つかりませんでした:', error);
-        });
+    twitterBirdIconPaths.forEach((twitterBirdIconPath) => {
+        waitForElement(() => document.querySelector(twitterBirdIconPath), 500)
+            .then((twitterBirdIcon) => {
+                var color = '#88ff88';//green
+                if (limitRemainingPercent <= 20)
+                    color = '#ff8888';//red
+                twitterBirdIcon.style.background = `linear-gradient(white ${100 - limitRemainingPercent}%, ${color} ${100 - limitRemainingPercent}%)`;
+            })
+            .catch((error) => {
+                console.log('要素が見つかりませんでした:', error);
+            });
+    })
 }
 
 function updateDisplay() {
@@ -123,24 +126,26 @@ function updateDisplay() {
 }
 
 function addToggleFunction() {
-    waitForElement(() => document.querySelector('#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1awozwy.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a'), 500)
-        .then((twitterBirdIcon) => {
-            var containerElement = document.getElementById('APILimitNotifier-container');
-            twitterBirdIcon.addEventListener('click', function(event) {
-                event.preventDefault();
+    twitterBirdIconPaths.forEach((twitterBirdIconPath) => {
+        waitForElement(() => document.querySelector(twitterBirdIconPath), 500)
+            .then((twitterBirdIcon) => {
+                var containerElement = document.getElementById('APILimitNotifier-container');
+                twitterBirdIcon.addEventListener('click', function(event) {
+                    event.preventDefault();
+                });
+                twitterBirdIcon.onclick = function () {
+                    if (containerElement.style.display === 'none') {
+                        containerElement.style.display = 'block';
+                    }
+                    else {
+                        containerElement.style.display = 'none';
+                    }
+                };
+            })
+            .catch((error) => {
+                console.log('要素が見つかりませんでした:', error);
             });
-            twitterBirdIcon.onclick = function () {
-                if (containerElement.style.display === 'none') {
-                    containerElement.style.display = 'block';
-                }
-                else {
-                    containerElement.style.display = 'none';
-                }
-            };
-        })
-        .catch((error) => {
-            console.log('要素が見つかりませんでした:', error);
-        });
+    })
 }
 
 (function(open) {
@@ -161,8 +166,6 @@ function addToggleFunction() {
 
 window.addEventListener('load', function() {
     initializePopup();
-    setTimeout(function() {
-        addToggleFunction();
-    }, 3000);
+    addToggleFunction();
     updateDisplay();
 });
