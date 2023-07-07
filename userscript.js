@@ -5,6 +5,7 @@
 // @description  Monitor twitter api limit
 // @author       https://twitter.com/kumakumaaaaa__
 // @match        https://twitter.com/*
+// @match        https://tweetdeck.twitter.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=twitter.com
 // @grant        none
 // @license MIT
@@ -12,7 +13,7 @@
 
 var notifiyPercents = [20, 50, 100];
 var notifiyColors = ['#ff8888', '#ffff88', '#ffffff']
-var twitterBirdIconPaths = ['#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1habvwh.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a', '#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1awozwy.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a']
+var twitterBirdIconPaths = {twitter: ['#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1habvwh.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a', '#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > header > div > div > div > div.css-1dbjc4n.r-1awozwy.r-e4l2kj.r-1rnoaur > div.css-1dbjc4n.r-dnmrzs.r-1vvnge1 > h1 > a'], tweetdeck: ['#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-5swwoo.r-13qz1uu.r-417010 > div > div > div.css-1dbjc4n.r-1awozwy.r-18u37iz.r-1wtj0ep.r-1m04atk.r-i023vh.r-5njf8e.r-13qz1uu > div.css-901oao.r-1awozwy.r-18jsvk2.r-xoduu5.r-1tl8opc.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0 > svg']}
 
 function waitForElement(selectFunction, interval) {
     return new Promise((resolve) => {
@@ -27,6 +28,10 @@ function waitForElement(selectFunction, interval) {
 }
 
 function initializePopup() {
+    var place = 'top'
+    if (window.location.href.startsWith('https://tweetdeck.twitter.com/')) {
+        place = 'bottom'
+    }
     var div = document.createElement('div');
     div.innerHTML = '<div id="APILimitNotifier-container"></div>';
     document.body.appendChild(div);
@@ -34,7 +39,7 @@ function initializePopup() {
     styleElement.innerHTML = `
     #APILimitNotifier-container {
         position: fixed;
-        top: 70px;
+        ${place}: 70px;
         left: 10px;
         z-index: 1000;
         display: none;
@@ -91,7 +96,11 @@ function storeLimit(urlName, limitRemaining, limitReset, limitLimit) {
 }
 
 function displayLimitRemainingPercent(limitRemainingPercent) {
-    twitterBirdIconPaths.forEach((twitterBirdIconPath) => {
+    var site = 'twitter'
+    if (window.location.href.startsWith('https://tweetdeck.twitter.com/')) {
+        site = 'tweetdeck'
+    }
+    twitterBirdIconPaths[site].forEach((twitterBirdIconPath) => {
         waitForElement(() => document.querySelector(twitterBirdIconPath), 500)
             .then((twitterBirdIcon) => {
                 var color = '#88ff88';//green
@@ -127,7 +136,11 @@ function updateDisplay() {
 }
 
 function addToggleFunction() {
-    twitterBirdIconPaths.forEach((twitterBirdIconPath) => {
+    var site = 'twitter'
+    if (window.location.href.startsWith('https://tweetdeck.twitter.com/')) {
+        site = 'tweetdeck'
+    }
+    twitterBirdIconPaths[site].forEach((twitterBirdIconPath) => {
         waitForElement(() => document.querySelector(twitterBirdIconPath), 500)
             .then((twitterBirdIcon) => {
                 var containerElement = document.getElementById('APILimitNotifier-container');
